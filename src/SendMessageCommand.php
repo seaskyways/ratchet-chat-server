@@ -26,33 +26,26 @@ class SendMessageCommand
     function execute(...$data)
     {
         $message = $data[0];
-        $this->msgLog[] = $message;
 
         $from = $data[1];
         $clients = $data[2];
-        $msg = command("message",["message" => $message]);
+        $msg = command("message", [
+            "message" => $message,
+            "sender_name" => IdGeneratorCommand::getPersonName(Chat::$clients[$from]["id"])
+        ]);
+        $this->msgLog[] = $msg;
 
         foreach ($clients as $client) {
-//            if ($from !== $client) {
-                $client->send($msg);
-//            }
+            /** @noinspection PhpUndefinedMethodInspection */
+            $client->send($msg);
         }
     }
 
     function resendMessages(ConnectionInterface $conn)
     {
         foreach ($this->msgLog as $msg) {
-            $conn->send(json_encode([
-                "command" => "message",
-                "data" => [
-                    "message" => $msg
-                ]
-            ]));
+            $conn->send($msg);
         }
     }
 
-    function doIfMatches(string $commandTag, array $data)
-    {
-        throw new UndefinedFunctionException();
-    }
 }

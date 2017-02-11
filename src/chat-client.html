@@ -17,29 +17,30 @@
 <body ng-app="myApp" ng-controller="myCtrl" class="container">
 <br>
 <div class="row">
-    <div class="col-xs-4">
+    <div class="col-xs-9 col-md-4">
         <input type="text"
                id="nameInput"
                title="Enter Your Name"
                ng-model="nameInput"
+               ng-keypress="onKeyPress($event.which, 'name')"
                class="form-control">
     </div>
 
-    <button ng-click="saveName(nameInput)" class="col-xs-3 btn btn-success">Save Name</button>
-</div>
-<div class="row">
-    <div class="col-xs-9">
+    <button class="col-xs-3 col-md-2 btn btn-success"
+            ng-click="saveName(nameInput)">Save Name
+    </button>
+
+    <div class="col-xs-9 col-md-4">
         <input type="text"
                id="chatInput"
                title="Enter Text"
                ng-model="chatInput"
-               ng-keypress="onKeyPress($event.which)"
+               ng-keypress="onKeyPress($event.which, 'chat')"
                class="form-control">
     </div>
 
-    <button ng-click="sendMessage(chatInput)" class="col-xs-3 btn btn-success">Send</button>
+    <button ng-click="sendMessage(chatInput)" class="col-xs-3 col-md-2 btn btn-success">Send</button>
 </div>
-
 <br>
 <div class="row">
     <div class="col-xs-12">
@@ -57,7 +58,7 @@
     function Message(srcId, text, senderName) {
         this.srcId = srcId;
         this.text = text;
-        this.senderName = srcId;
+        this.senderName = senderName || srcId;
 
         this.asJson = function () {
             return {
@@ -69,7 +70,7 @@
     }
 
     Message.fromJson = function (json) {
-        return new Message(json["id"], json["msg"])
+        return new Message(null, json["message"], json["sender_name"]);
     };
 
     function command(command, data) {
@@ -103,27 +104,33 @@
 
                     $scope.myId = id;
                     $scope.myName = name;
+                    $scope.nameInput = name;
                 } else if (command === "message") {
-                    $scope.chat.push(Message.fromJson(data["message"]));
+                    $scope.chat.push(Message.fromJson(data));
                 }
                 $scope.$apply();
             };
 
             $scope.sendMessage = function (msg) {
                 if (msg.length != 0) {
-                    var msgObj = new Message($scope.myId, msg);
-
-                    var cmd = command("send_message", msgObj.asJson());
+                    var cmd = command("send_message", msg);
                     conn.send(cmd);
-
-//                    $scope.chat.push(msgObj)
                 }
                 $scope.chatInput = "";
             };
 
-            $scope.onKeyPress = function (keyNumber) {
-                if (keyNumber === 13) {
-                    $scope.sendMessage($scope.chatInput)
+            $scope.onKeyPress = function (keyNumber, fieldType) {
+                switch (fieldType) {
+                    case "name" :
+                        if (keyNumber === 13) {
+                            $scope.saveName($scope.nameInput)
+                        }
+                        break;
+                    case "chat" :
+                        if (keyNumber === 13) {
+                            $scope.sendMessage($scope.chatInput)
+                        }
+                        break;
                 }
             };
 
@@ -138,6 +145,7 @@
             };
 
             $scope.saveName = function (name) {
+                $scope.sendMessage($scope.myName + " has changed name to " + name);
                 conn.send(command("save_name", {
                     "id": $scope.myId,
                     "name": name

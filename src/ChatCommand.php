@@ -8,7 +8,7 @@
 
 namespace MyApp;
 
-function command(string $command, array $data = []): string
+function command(string $command, $data = []): string
 {
     return json_encode([
         "command" => $command,

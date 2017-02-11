@@ -18,13 +18,13 @@ require dirname(__DIR__) . '/vendor/autoload.php';
 
 class Chat implements MessageComponentInterface
 {
-    protected $clients;
+    static public $clients;
     protected $idCommander, $sendMessageCommander, $saveNameCommander;
     protected $nameMap = array();
 
     function __construct()
     {
-        $this->clients = new SplObjectStorage;
+        Chat::$clients = new SplObjectStorage;
         $this->idCommander = new IdGeneratorCommand;
         $this->sendMessageCommander = new SendMessageCommand;
         $this->saveNameCommander = new NameCommand;
@@ -32,13 +32,14 @@ class Chat implements MessageComponentInterface
 
     function onOpen(ConnectionInterface $conn)
     {
-        $this->clients->attach($conn);
+        Chat::$clients->attach($conn);
+        Chat::$clients[$conn] = [];
         echo "New Connection ! ({$conn->resourceId})" . PHP_EOL;
     }
 
     function onClose(ConnectionInterface $conn)
     {
-        $this->clients->detach($conn);
+        Chat::$clients->detach($conn);
         echo "Just removed {$conn->resourceId}" . PHP_EOL;
     }
 
@@ -76,7 +77,7 @@ class Chat implements MessageComponentInterface
             return;
         } elseif ($this->sendMessageCommander->matches($commandTag)) {
 
-            $this->sendMessageCommander->execute($data, $from, $this->clients);
+            $this->sendMessageCommander->execute($data, $from, Chat::$clients);
             return;
 
         } elseif ($this->saveNameCommander->matches($commandTag)) {

@@ -31,7 +31,10 @@ class IdGeneratorCommand
 
     function execute(...$data)
     {
+
+        $conn = $data[0];
         $lastToken = $data[1];
+        $id = null;
 
         if (empty($lastToken)) {
 
@@ -47,14 +50,13 @@ class IdGeneratorCommand
                 ]
             ]);
 
-            $data[0]->send($result, null);
+            $conn->send($result, null);
 
             echo "Sent new token : " . $token . PHP_EOL;
-
+            $id = $this->lastId;
             $this->lastId++;
         } else {
 
-            $id = null;
             foreach ($this->tokenMap as $t => $_) {
                 if ($lastToken == $t) {
                     $id = $this->tokenMap[$lastToken];
@@ -64,6 +66,7 @@ class IdGeneratorCommand
             if (empty($id)) {
                 echo "Couldn't find id for token " . $lastToken . PHP_EOL;
                 $this->execute($data[0], null);
+                return;
             } else {
                 echo "User with id: $id just rejoined !";
 
@@ -78,6 +81,10 @@ class IdGeneratorCommand
                 ]));
             }
         }
+
+        $obj = Chat::$clients[$conn];
+        $obj["id"] = $id;
+        Chat::$clients[$conn] = $obj;
     }
 
     private function generateToken()
@@ -93,7 +100,7 @@ class IdGeneratorCommand
         return $token;
     }
 
-    private function getPersonName($id): string
+    static public function getPersonName($id): string
     {
         if (array_key_exists($id, $GLOBALS["nameMap"])) {
             return $GLOBALS["nameMap"][$id];
