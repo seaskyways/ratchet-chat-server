@@ -21,7 +21,6 @@ class Chat implements MessageComponentInterface
     protected $clients;
     protected $idCommander, $sendMessageCommander, $saveNameCommander;
     protected $nameMap = array();
-    protected $wholeChat = array();
 
     function __construct()
     {
@@ -78,7 +77,6 @@ class Chat implements MessageComponentInterface
         } elseif ($this->sendMessageCommander->matches($commandTag)) {
 
             $this->sendMessageCommander->execute($data, $from, $this->clients);
-            array_push($this->wholeChat, $data);
             return;
 
         } elseif ($this->saveNameCommander->matches($commandTag)) {

@@ -8,8 +8,10 @@
 
 namespace MyApp;
 
-class IdGeneratorCommand implements ChatCommand
+class IdGeneratorCommand
 {
+    use ChatCommand;
+
     public $tokenMap;
     private $lastId = 1;
     public $doOnExecute;
@@ -21,9 +23,10 @@ class IdGeneratorCommand implements ChatCommand
         };
     }
 
-    function matches(string $commandTag): bool
+
+    function getCommandTag(): string
     {
-        return $commandTag === "get_id";
+        return "get_id";
     }
 
     function execute(...$data)
@@ -62,6 +65,8 @@ class IdGeneratorCommand implements ChatCommand
                 echo "Couldn't find id for token " . $lastToken . PHP_EOL;
                 $this->execute($data[0], null);
             } else {
+                echo "User with id: $id just rejoined !";
+
                 $data[0]->send(json_encode([
                     "command" => "connection_info",
                     "data" => [
@@ -94,13 +99,6 @@ class IdGeneratorCommand implements ChatCommand
             return $GLOBALS["nameMap"][$id];
         } else {
             return "";
-        }
-    }
-
-    function doIfMatches(string $commandTag, array $data)
-    {
-        if ($this->matches($commandTag)) {
-            $this->execute($data);
         }
     }
 }

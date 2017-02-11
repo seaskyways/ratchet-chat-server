@@ -9,17 +9,18 @@
 namespace MyApp;
 
 
-class NameCommand implements ChatCommand
+class NameCommand
 {
+    use ChatCommand;
 
     function __construct()
     {
         $GLOBALS["nameMap"] = array();
     }
 
-    function matches(string $commandTag): bool
+    function getCommandTag(): string
     {
-        return $commandTag === "save_name";
+        return "save_name";
     }
 
     function execute(...$data)

@@ -8,18 +8,30 @@
 
 namespace MyApp;
 
-function command(string $command ,array $data = []) : string {
+function command(string $command, array $data = []): string
+{
     return json_encode([
         "command" => $command,
         "data" => $data
     ]);
 }
 
-interface ChatCommand
+trait ChatCommand
 {
-    function matches(string $commandTag) : bool ;
+    abstract function getCommandTag(): string;
 
-    function execute(...$data);
+    abstract function execute(...$data);
 
-    function doIfMatches(string $commandTag, array $data);
+    function matches(string $commandTag): bool{
+        return $commandTag === $this->getCommandTag();
+    }
+
+    function doIfMatches(string $commandTag,...$data) : bool
+    {
+        $match = $this->matches($commandTag);
+        if ($match){
+            $this->execute(...$data);
+        }
+        return $match;
+    }
 }

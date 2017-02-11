@@ -12,12 +12,10 @@ use MyApp\ChatClientServer;
 use Ratchet\App;
 
 
-$app = new App("192.168.2.11", 80, '0.0.0.0');
-
+$app = new App("192.168.0.100", 80, '0.0.0.0');
 $chatClient = new ChatClientServer;
 
 $app->route("/", $chatClient, ["*"]);
-$app->route("/app", $chatClient, ["*"]);
 
 $app->route("/chat/ws", new Chat(), ["*"]);
 

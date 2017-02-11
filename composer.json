@@ -6,11 +6,6 @@
   },
   "require": {
     "cboden/ratchet": "v0.3.6",
-    "reactivex/rxphp": "^1.5",
-    "francium/diffsocket": "v0.1.1",
-    "symfony/symfony": "3.2.*",
-    "symfony/swiftmailer-bundle": "^2.3.10",
-    "symfony/monolog-bundle": "^3.0.2",
-    "symfony/polyfill-apcu": "^1.0"
+    "reactivex/rxphp": "^1.5"
   }
 }

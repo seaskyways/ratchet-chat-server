@@ -12,40 +12,36 @@ namespace MyApp;
 use Ratchet\ConnectionInterface;
 use Symfony\Component\Debug\Exception\UndefinedFunctionException;
 
-class SendMessageCommand implements ChatCommand
+class SendMessageCommand
 {
+    use ChatCommand;
+
     private $msgLog = array();
 
-    function matches(string $commandTag): bool
+    function getCommandTag(): string
     {
-        return $commandTag === "send_message";
+        return "send_message";
     }
 
     function execute(...$data)
     {
         $message = $data[0];
-
         $this->msgLog[] = $message;
 
         $from = $data[1];
-        $clients = (array)$data[2];
+        $clients = $data[2];
+        $msg = command("message",["message" => $message]);
 
         foreach ($clients as $client) {
-            if ($from !== $client) {
-                $client->send(json_encode([
-                    "command" => "message",
-                    "data" => [
-                        "message" => $message
-                    ]
-                ]));
-            }
+//            if ($from !== $client) {
+                $client->send($msg);
+//            }
         }
     }
 
     function resendMessages(ConnectionInterface $conn)
     {
         foreach ($this->msgLog as $msg) {
-            echo "Sending : " . $msg . PHP_EOL;
             $conn->send(json_encode([
                 "command" => "message",
                 "data" => [
