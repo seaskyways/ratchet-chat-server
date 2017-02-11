@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>SSW Chat</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.1/angular.min.js"></script>
+    <script
+            src="https://code.jquery.com/jquery-3.1.1.min.js"
+            integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8="
+            crossorigin="anonymous"></script>
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+</head>
+
+<body ng-app="myApp" ng-controller="myCtrl" class="container">
+<br>
+<div class="row">
+    <div class="col-xs-4">
+        <input type="text"
+               id="nameInput"
+               title="Enter Your Name"
+               ng-model="nameInput"
+               class="form-control">
+    </div>
+
+    <button ng-click="saveName(nameInput)" class="col-xs-3 btn btn-success">Save Name</button>
+</div>
+<div class="row">
+    <div class="col-xs-9">
+        <input type="text"
+               id="chatInput"
+               title="Enter Text"
+               ng-model="chatInput"
+               ng-keypress="onKeyPress($event.which)"
+               class="form-control">
+    </div>
+
+    <button ng-click="sendMessage(chatInput)" class="col-xs-3 btn btn-success">Send</button>
+</div>
+
+<br>
+<div class="row">
+    <div class="col-xs-12">
+        <ul id="chatContainer">
+            <li ng-repeat="msg in chat">
+                <span style="text-overflow: ellipsis">
+                {{msg.senderName}} says : {{msg.text}}
+                </span>
+            </li>
+        </ul>
+    </div>
+</div>
+</body>
+<script>
+    function Message(srcId, text, senderName) {
+        this.srcId = srcId;
+        this.text = text;
+        this.senderName = srcId;
+
+        this.asJson = function () {
+            return {
+                msg: this.text,
+                id: this.srcId
+            }
+        };
+        return this;
+    }
+
+    Message.fromJson = function (json) {
+        return new Message(json["id"], json["msg"])
+    };
+
+    function command(command, data) {
+        return JSON.stringify({
+            command: command,
+            data: data
+        })
+    }
+
+    angular.module('myApp', [])
+        .controller("myCtrl", function ($scope) {
+            $scope.chat = [];
+            $scope.chatInput = "";
+            $scope.nameInput = "";
+            $scope.myId = -1;
+            var conn = new WebSocket("ws://192.168.2.11/chat/ws");
+
+            conn.onmessage = function (msg) {
+                var asJson = JSON.parse(msg.data);
+                var command = asJson["command"];
+                var data = asJson["data"];
+
+                if (command === "connection_info") {
+                    var id = data["connection_id"];
+                    var name = data["name"] || id;
+                    var token;
+
+//                    if (data["should_invalidate"]) {
+                    localStorage.setItem("connection_token", data["token"]);
+//                    }
+
+                    $scope.myId = id;
+                    $scope.myName = name;
+                } else if (command === "message") {
+                    $scope.chat.push(Message.fromJson(data["message"]));
+                }
+                $scope.$apply();
+            };
+
+            $scope.sendMessage = function (msg) {
+                if (msg.length != 0) {
+                    var msgObj = new Message($scope.myId, msg);
+
+                    var cmd = command("send_message", msgObj.asJson());
+                    conn.send(cmd);
+
+                    $scope.chat.push(msgObj)
+                }
+                $scope.chatInput = "";
+            };
+
+            $scope.onKeyPress = function (keyNumber) {
+                if (keyNumber === 13) {
+                    $scope.sendMessage($scope.chatInput)
+                }
+            };
+
+
+            conn.onopen = function (event) {
+                var oldToken = localStorage.getItem("connection_token");
+                if (oldToken) {
+                    conn.send(command("get_id", oldToken))
+                } else {
+                    conn.send(command("get_id", ""))
+                }
+            };
+
+            $scope.saveName = function (name) {
+                conn.send(command("save_name", {
+                    "id": $scope.myId,
+                    "name": name
+                }));
+                $scope.myName = name;
+            };
+
+        });
+</script>
+</html>
