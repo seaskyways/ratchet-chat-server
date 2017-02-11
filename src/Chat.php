@@ -34,18 +34,18 @@ class Chat implements MessageComponentInterface
     {
         Chat::$clients->attach($conn);
         Chat::$clients[$conn] = [];
-        echo "New Connection ! ({$conn->resourceId})" . PHP_EOL;
+//        echo "New Connection ! ({$conn->resourceId})" . PHP_EOL;
     }
 
     function onClose(ConnectionInterface $conn)
     {
         Chat::$clients->detach($conn);
-        echo "Just removed {$conn->resourceId}" . PHP_EOL;
+//        echo "Just removed {$conn->resourceId}" . PHP_EOL;
     }
 
     function onError(ConnectionInterface $conn, \Exception $e)
     {
-        echo "An error has occurred: {$e->getMessage()}\n";
+//        echo "An error has occurred: {$e->getMessage()}\n";
         $conn->close();
     }
 
@@ -57,6 +57,8 @@ class Chat implements MessageComponentInterface
             echo $exception->getTraceAsString();
             return;
         }
+
+        echo "received message : " . $msg;
 
         if (!array_key_exists("command", $asJson)) {
             return;

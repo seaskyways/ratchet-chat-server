@@ -50,7 +50,7 @@ class IdGeneratorCommand
                 ]
             ]);
 
-            $conn->send($result, null);
+            $conn->send($result);
 
             echo "Sent new token : " . $token . PHP_EOL;
             $id = $this->lastId;
@@ -82,7 +82,7 @@ class IdGeneratorCommand
             }
         }
 
-        $obj = Chat::$clients[$conn];
+        $obj = Chat::$clients[$conn] = [];
         $obj["id"] = $id;
         Chat::$clients[$conn] = $obj;
     }
@@ -105,7 +105,7 @@ class IdGeneratorCommand
         if (array_key_exists($id, $GLOBALS["nameMap"])) {
             return $GLOBALS["nameMap"][$id];
         } else {
-            return "";
+            return "$id";
         }
     }
 }

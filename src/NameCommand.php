@@ -28,13 +28,15 @@ class NameCommand
         $id = $data[0];
         $name = $data[1];
 
+        $oldName = $GLOBALS["nameMap"][$id] ?? $id;
         $GLOBALS["nameMap"][$id] = $name;
 
+        foreach (Chat::$clients as $c){
+            $c->send(command("message",[
+                "message" => "$oldName changed name to $name",
+                "sender_name" => "server"
+            ]));
+        }
         echo "Names are " . json_encode($GLOBALS["nameMap"]) . PHP_EOL;
-    }
-
-    function doIfMatches(string $commandTag, array $data)
-    {
-        // TODO: Implement doIfMatches() method.
     }
 }

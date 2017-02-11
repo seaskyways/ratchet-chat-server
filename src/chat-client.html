@@ -145,7 +145,6 @@
             };
 
             $scope.saveName = function (name) {
-                $scope.sendMessage($scope.myName + " has changed name to " + name);
                 conn.send(command("save_name", {
                     "id": $scope.myId,
                     "name": name
