@@ -40,6 +40,8 @@
     </div>
 
     <button ng-click="sendMessage(chatInput)" class="col-xs-3 col-md-2 btn btn-success">Send</button>
+
+    <button ng-click="toggleRecording()" class="col-xs-3 col-md-2 btn btn-danger">Start Recording</button>
 </div>
 <br>
 <div class="row">
@@ -78,6 +80,19 @@
             command: command,
             data: data
         })
+    }
+
+    var context;
+    window.addEventListener('load', init, false);
+    function init() {
+        try {
+            // Fix up for prefixing
+            window.AudioContext = window.AudioContext||window.webkitAudioContext;
+            context = new AudioContext();
+        }
+        catch(e) {
+            alert('Web Audio API is not supported in this browser');
+        }
     }
 
     angular.module('myApp', [])
@@ -152,6 +167,9 @@
                 $scope.myName = name;
             };
 
+            $scope.toggleRecording = function () {
+
+            }
         });
 </script>
 </html>
