@@ -1,11 +1,15 @@
 {
   "autoload": {
     "psr-4": {
-      "MyApp\\": "src/"
+      "MyApp\\Chat\\": "src/app/chat",
+      "MyApp\\Command\\" : "src/app/command",
+      "MyApp\\Server\\" : "src/app/server"
     }
   },
   "require": {
     "cboden/ratchet": "v0.3.6",
-    "reactivex/rxphp": "^1.5"
+    "reactivex/rxphp": "^1.5",
+    "slim/slim-skeleton": "3.1.2",
+    "twig/twig": "v2.1.0"
   }
 }

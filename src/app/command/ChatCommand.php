@@ -6,7 +6,7 @@
  * Time: 10:38 AM
  */
 
-namespace MyApp;
+namespace MyApp\Command;
 
 function command(string $command, $data = []): string
 {

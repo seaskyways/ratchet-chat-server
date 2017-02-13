@@ -5,8 +5,7 @@
  * Date: 01/02 - Feb/17
  * Time: 3:19 PM
  */
-namespace MyApp;
-
+namespace MyApp\Chat;
 
 use Exception;
 use Ratchet\{

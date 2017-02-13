@@ -6,11 +6,12 @@
  * Time: 10:57 AM
  */
 
-namespace MyApp;
+namespace MyApp\Command;
 
 
+use MyApp\Chat\Chat;
 use Ratchet\ConnectionInterface;
-use Symfony\Component\Debug\Exception\UndefinedFunctionException;
+
 
 class SendMessageCommand
 {

@@ -6,12 +6,12 @@
  * Time: 10:06 AM
  */
 
-namespace MyApp;
+namespace MyApp\Chat;
 
 
 use Ratchet\ConnectionInterface;
 use Ratchet\MessageComponentInterface;
-use Ratchet\Wamp\WampServerInterface;
+
 
 class AudioChat implements MessageComponentInterface
 {

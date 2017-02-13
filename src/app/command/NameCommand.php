@@ -6,8 +6,10 @@
  * Time: 12:41 PM
  */
 
-namespace MyApp;
+namespace MyApp\Command;
 
+
+use MyApp\Chat\Chat;
 
 class NameCommand
 {

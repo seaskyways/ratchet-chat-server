@@ -6,7 +6,9 @@
  * Time: 10:39 AM
  */
 
-namespace MyApp;
+namespace MyApp\Command;
+
+use MyApp\Chat\Chat;
 
 class IdGeneratorCommand
 {
