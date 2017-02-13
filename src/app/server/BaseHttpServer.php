@@ -30,7 +30,7 @@ class BaseHttpServer extends SlimHttpServer
     protected function setupSlimApp(App $app)
     {
         $app->get("[/]", function (Request $request, Response $response) {
-            echo $GLOBALS["twig"]->render("chat-client.html");
+            echo $GLOBALS["twig"]->render("chat-client.twig");
             return $response;
         });
         $app->get("/src/{dir}/{file}", function (Request $r, Response $response, $dir, $file) {

@@ -13,11 +13,20 @@ use Ratchet\App;
 use Symfony\Component\Routing\Route;
 
 $GLOBALS["loader"] = $loader = new Twig_Loader_Filesystem(dirname(__DIR__) . "/template");
-$GLOBALS["twig"] = new Twig_Environment($loader, array(
+$GLOBALS["twig"] = $twig = new Twig_Environment($loader, array(
+    'cache' => dirname(__DIR__) . "/template/cache",
     'debug' => true,
 ));
 
-$app = new App("localhost", 80, '0.0.0.0');
+$GLOBALS["baseurl"] = $baseurl = "192.168.0.100";
+
+$twig->addGlobal("baseurl", $baseurl);
+$twig->addFunction(new Twig_Function("ng", function ($exp) {
+    return "{{ $exp }}";
+}));
+
+
+$app = new App($baseurl, 80, '0.0.0.0');
 
 $app->route("/chat/ws", new Chat(), ["*"]);
 
@@ -31,7 +40,7 @@ $app->routes->add("some_static_html", new Route("/{opt}",
             "opt" => '.*'
         ),
         array(),
-        "localhost",
+        $baseurl,
         array(),
         array('GET', 'POST', 'DELETE')
     )

@@ -38,7 +38,7 @@
 
     <button ng-click="sendMessage(chatInput)" class="col-xs-3 col-md-2 btn btn-success">Send</button>
 
-    <button ng-click="toggleRecording()" class="col-xs-3 col-md-2 btn btn-danger">Start Recording</button>
+    {#<button ng-click="toggleRecording()" class="col-xs-3 col-md-2 btn btn-danger">Start Recording</button>#}
 </div>
 <br>
 <div class="row">
@@ -46,7 +46,7 @@
         <ul id="chatContainer">
             <li ng-repeat="msg in chat">
                 <span style="text-overflow: ellipsis">
-                {{msg.senderName}} says : {{msg.text}}
+                    {{ ng('msg.senderName') }} says : {{ ng('msg.text ') }}
                 </span>
             </li>
         </ul>
@@ -98,7 +98,7 @@
             $scope.chatInput = "";
             $scope.nameInput = "";
             $scope.myId = -1;
-            var conn = new WebSocket("ws://192.168.2.11/chat/ws");
+            var conn = new WebSocket("ws://{{ baseurl }}/chat/ws");
 
             conn.onmessage = function (msg) {
                 var asJson = JSON.parse(msg.data);
