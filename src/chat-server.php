@@ -10,13 +10,30 @@ require dirname(__DIR__) . '/vendor/autoload.php';
 use MyApp\Chat;
 use MyApp\ChatClientServer;
 use Ratchet\App;
+use Symfony\Component\Routing\Route;
 
 
-$app = new App("192.168.0.100", 80, '0.0.0.0');
+$app = new App("192.168.2.11", 80, '0.0.0.0');
 $chatClient = new ChatClientServer;
 
 $app->route("/", $chatClient, ["*"]);
-
 $app->route("/chat/ws", new Chat(), ["*"]);
+
+$app->routes->add("some_static_html", new Route("/hello/{opt}",
+        array(
+            "_controller" => new \MyApp\WildController("/hello"),
+            "opt" => ""
+        ),
+        array(
+            'Origin' => "localhost",
+            "opt" => '.*'
+        ),
+        array(),
+        "localhost",
+        array(),
+        array('GET')
+    )
+);
+
 
 $app->run();

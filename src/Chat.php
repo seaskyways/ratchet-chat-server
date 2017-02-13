@@ -8,6 +8,7 @@
 namespace MyApp;
 
 
+use Exception;
 use Ratchet\{
     ConnectionInterface, MessageComponentInterface
 };
@@ -43,7 +44,7 @@ class Chat implements MessageComponentInterface
 //        echo "Just removed {$conn->resourceId}" . PHP_EOL;
     }
 
-    function onError(ConnectionInterface $conn, \Exception $e)
+    function onError(ConnectionInterface $conn, Exception $e)
     {
 //        echo "An error has occurred: {$e->getMessage()}\n";
         $conn->close();
@@ -53,12 +54,12 @@ class Chat implements MessageComponentInterface
     {
         try {
             $asJson = json_decode($msg, true);
-        } catch (\Exception $exception) {
+        } catch (Exception $exception) {
             echo $exception->getTraceAsString();
             return;
         }
 
-        echo "received message : " . $msg;
+        echo "received message : " . $msg . PHP_EOL;
 
         if (!array_key_exists("command", $asJson)) {
             return;
