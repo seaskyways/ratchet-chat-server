@@ -8,13 +8,13 @@
 namespace MyApp\Chat;
 
 use Exception;
+use MyApp\Command\IdGeneratorCommand;
+use MyApp\Command\NameCommand;
+use MyApp\Command\SendMessageCommand;
 use Ratchet\{
     ConnectionInterface, MessageComponentInterface
 };
 use SplObjectStorage;
-
-
-require dirname(__DIR__) . '/vendor/autoload.php';
 
 class Chat implements MessageComponentInterface
 {

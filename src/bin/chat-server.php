@@ -5,20 +5,20 @@
  * Date: 01/02 - Feb/17
  * Time: 3:57 PM
  */
-require dirname(__DIR__, 2) . '/vendor/autoload.php';
+require dirname(dirname(__DIR__)) . DIRECTORY_SEPARATOR . 'vendor' . DIRECTORY_SEPARATOR . 'autoload.php';
 
 use MyApp\Chat\Chat;
-use MyApp\Chat\ChatClientServer;
 use MyApp\Server\BaseHttpServer;
 use Ratchet\App;
 use Symfony\Component\Routing\Route;
 
+$GLOBALS["loader"] = $loader = new Twig_Loader_Filesystem(dirname(__DIR__) . "/template");
+$GLOBALS["twig"] = new Twig_Environment($loader, array(
+    'debug' => true,
+));
 
 $app = new App("localhost", 80, '0.0.0.0');
 
-$chatClient = new ChatClientServer;
-
-//$app->route("/", $chatClient, ["*"]);
 $app->route("/chat/ws", new Chat(), ["*"]);
 
 $app->routes->add("some_static_html", new Route("/{opt}",

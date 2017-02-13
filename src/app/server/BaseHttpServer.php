@@ -29,10 +29,17 @@ class BaseHttpServer extends SlimHttpServer
 
     protected function setupSlimApp(App $app)
     {
-        $app->get("/[{hi}]", function (Request $request, Response $response, $hi) {
-            echo "Hello guys !";
-            if (!empty($hi)) {
-                echo PHP_EOL . "Especially : " . $hi;
+        $app->get("[/]", function (Request $request, Response $response) {
+            echo $GLOBALS["twig"]->render("chat-client.html");
+            return $response;
+        });
+        $app->get("/src/{dir}/{file}", function (Request $r, Response $response, $dir, $file) {
+            $filePath = dirname(__DIR__, 2) . "/$dir/$file";
+            if (file_exists($filePath)) {
+                $response->getBody()->write(file_get_contents($filePath));
+            } else {
+                $response->getBody()->write($GLOBALS["twig"]->render("error.html"));
+                $response->withStatus(404, "File not found");
             }
             return $response;
         });
