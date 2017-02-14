@@ -18,3 +18,7 @@ $twig->addGlobal("baseurl", $baseurl);
 $twig->addFunction(new Twig_Function("ng", function ($exp) {
     return "{{ $exp }}";
 }));
+
+$twig->addFilter(new Twig_Filter("ng", function ($arg) {
+    return "{{ $arg }}";
+}));

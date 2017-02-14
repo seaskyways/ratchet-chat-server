@@ -6,7 +6,6 @@
  * Time: 2:40 PM
  */
 
-$scopeBaseUrl = "192.168.2.11";
-$homeBaseUrl = "192.168.2.11";
+require_once 'base-url.php';
 
-$GLOBALS["baseurl"] = $baseurl = $scopeBaseUrl;
+$GLOBALS["baseurl"] = $baseurl;

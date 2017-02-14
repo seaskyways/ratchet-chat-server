@@ -14,7 +14,7 @@ use Slim\Handlers\Strategies\RequestResponseArgs;
 use Slim\Http\Request;
 use Slim\Http\Response;
 
-class BaseHttpServer extends SlimHttpServer
+class AppHttpServer extends SlimHttpServer
 {
 
     private $twig;
@@ -41,14 +41,20 @@ class BaseHttpServer extends SlimHttpServer
             return $response;
         });
 
-        $app->get("/{dir}/{file}", function (Request $r, Response $response, $dir, $file) {
+        $allowedDirs = ["js", "css", "fonts"];
+        $dirs = join("|", $allowedDirs);
+        $app->get("/{dir: $dirs }/{file}", function (Request $r, Response $response, $dir, $file) {
             $filePath = dirname(__DIR__, 2) . "/$dir/$file";
 
             if (file_exists($filePath)) {
-                $response->getBody()->write(file_get_contents($filePath));
+                $response
+                    ->withHeader("content-type", mime_content_type($filePath))
+                    ->write(file_get_contents($filePath));
             } else {
-                $response->withStatus(404, "File not found");
-                $response->getBody()->write($this->twig->render("error.html"));
+                $response
+                    ->withHeader("Content-Type", "text/html")
+                    ->withStatus(404, "File not found")
+                    ->write($GLOBALS["twig"]->render("error.twig"));
             }
             return $response;
         });

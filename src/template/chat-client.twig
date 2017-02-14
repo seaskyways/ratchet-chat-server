@@ -3,67 +3,83 @@
 {% block title %}Main{% endblock %}
 
 {% block content %}
-    <br>
-    <div class="mdl-grid--no-spacing">
-        <div class="mdl-cell--12-col mdl-card mdl-shadow--4dp">
-            <div class="mdl-card__title">
-                <h2 class="mdl-card__title-text">Chat</h2>
+    <div class="mdl-layout mdl-js-layout mdl-layout--fixed-header">
+        <header class="mdl-layout__header">
+            <div class="mdl-layout-icon">
+                <i class="fa fa-envelope fa-2x"></i>
             </div>
-            <form>
-                <div class="mdl-grid">
-                    <div class="mdl-cell--9-col-phone mdl-cell--4-col-desktop">
-                        <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
-                            <input type="text"
-                                   id="nameInput"
-                                   ng-model="nameInput"
-                                   ng-keypress="onKeyPress($event.which, 'name')"
-                                   class="mdl-textfield__input">
-                            <label for="nameInput" class="mdl-textfield__label">Enter Name</label>
+            <div class="mdl-layout__header-row">
+                <span class="mdl-layout__title">Chat App</span>
+            </div>
+        </header>
+
+        <main class="mdl-layout__content">
+            <div class="mdl-grid">
+                <div class="mdl-cell--10-col mdl-cell--1-offset-desktop">
+                    <div class="mdl-card mdl-shadow--4dp" style="width: 100%">
+                        <div class="mdl-card__title">
+                            <h2 class="mdl-card__title-text">Chat</h2>
+                        </div>
+
+                        <div class="mdl-grid">
+                            <div class="mdl-cell--8-col mdl-cell--1-offset-desktop mdl-cell--1-offset-tablet">
+                                <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+                                    <input type="text"
+                                           id="nameInput"
+                                           ng-model="nameInput"
+                                           ng-keypress="onKeyPress($event.which, 'name')"
+                                           class="mdl-textfield__input">
+                                    <label for="nameInput" class="mdl-textfield__label">Enter Name</label>
+                                </div>
+                            </div>
+
+                            <div class="mdl-cell--3-col">
+                                <button class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored mdl-color--green-600"
+                                        ng-click="saveName(nameInput)">
+                                    <span class="mdl-color-text--white">Save Name</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="mdl-grid">
+                            <div class="mdl-cell--8-col mdl-cell--1-offset-desktop mdl-cell--1-offset-tablet">
+                                <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+                                    <input type="text"
+                                           id="chatInput"
+                                           title="Enter Text"
+                                           ng-model="chatInput"
+                                           ng-keypress="onKeyPress($event.which, 'chat')"
+                                           class="mdl-textfield__input">
+                                    <label for="chatInput" class="mdl-textfield__label">Enter Message</label>
+                                </div>
+                            </div>
+
+                            <div class="mdl-cell--3-col">
+                                <button ng-click="sendMessage(chatInput)"
+                                        class="mdl-button mdl-js-button  mdl-button--raised mdl-button--colored mdl-button--colored mdl-color--green-600">
+                                    <span class="mdl-color-text--white">Send Message</span>
+                                </button>
+                            </div>
                         </div>
                     </div>
-
-                    <div class="mdl-cell--3-col-phone mdl-cell--2-col-desktop">
-                        <button class="mdl-button mdl-js-button mdl-button--fab mdl-button--colored mdl-color--green-600"
-                                ng-click="saveName(nameInput)">
-                            <i class="fa fa-save" aria-hidden="true"></i>
-                        </button>
-                    </div>
-
-                    <div class="mdl-cell--9-col-phone mdl-cell--4-col-desktop">
-                        <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
-                            <input type="text"
-                                   id="chatInput"
-                                   title="Enter Text"
-                                   ng-model="chatInput"
-                                   ng-keypress="onKeyPress($event.which, 'chat')"
-                                   class="mdl-textfield__input">
-                            <label for="chatInput" class="mdl-textfield__label">Enter Message</label>
-                        </div>
-                    </div>
-
-                    <div class="mdl-cell--3-col-phone mdl-cell--2-col-desktop">
-                        <button ng-click="sendMessage(chatInput)"
-                                class="mdl-button mdl-js-button mdl-button--fab mdl-button--colored mdl-button--colored mdl-color--green-600">
-                            <i class="fa fa-paper-plane-o"></i>
-                        </button>
-                    </div>
-
-                    {#<button ng-click="toggleRecording()" class="col-xs-3 col-md-2 btn btn-danger">Start Recording</button>#}
                 </div>
-            </form>
-        </div>
-    </div>
-    <br>
-    <div class="row">
-        <div class="col-xs-12" style="vertical-align: middle">
-            <ul id="chatContainer">
-                <li ng-repeat="msg in chat">
-                <span style="text-overflow: ellipsis">
-                    {{ ng('msg.senderName') }} says : {{ ng('msg.text ') }}
-                </span>
-                </li>
-            </ul>
-        </div>
+            </div>
+            <div class="mdl-grid">
+                <div class="
+                    mdl-cell--8-col-desktop mdl-cell--2-offset-desktop
+                    mdl-cell--12-col-tablet">
+                    <div class="mdl-card mdl-shadow--8dp" style="width: 100%">
+                        <ul class="mdl-list">
+                            <li class="mdl-list__item" ng-repeat="msg in chat">
+                                <span>
+                                    {{ 'msg.senderName'|ng }} says : {{ 'msg.text'|ng }}
+                                </span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </main>
     </div>
 {% endblock %}
 

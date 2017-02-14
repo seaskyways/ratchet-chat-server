@@ -8,7 +8,7 @@
 require dirname(dirname(__DIR__)) . DIRECTORY_SEPARATOR . 'vendor' . DIRECTORY_SEPARATOR . 'autoload.php';
 
 use MyApp\Chat\Chat;
-use MyApp\Server\BaseHttpServer;
+use MyApp\Server\AppHttpServer;
 use Ratchet\App;
 use Symfony\Component\Routing\Route;
 
@@ -21,7 +21,7 @@ $app->route("/ws/chat", new Chat(), ["*"]);
 
 $app->routes->add("some_static_html", new Route("/{opt}",
         array(
-            "_controller" => new BaseHttpServer(),
+            "_controller" => new AppHttpServer(),
             "opt" => ""
         ),
         array(
