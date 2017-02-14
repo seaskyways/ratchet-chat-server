@@ -12,23 +12,12 @@ use MyApp\Server\BaseHttpServer;
 use Ratchet\App;
 use Symfony\Component\Routing\Route;
 
-$GLOBALS["loader"] = $loader = new Twig_Loader_Filesystem(dirname(__DIR__) . "/template");
-$GLOBALS["twig"] = $twig = new Twig_Environment($loader, array(
-    'cache' => dirname(__DIR__) . "/template/cache",
-    'debug' => true,
-));
-
-$GLOBALS["baseurl"] = $baseurl = "192.168.0.100";
-
-$twig->addGlobal("baseurl", $baseurl);
-$twig->addFunction(new Twig_Function("ng", function ($exp) {
-    return "{{ $exp }}";
-}));
-
+require_once 'setup-server-host-url.php';
+require_once 'setup-twig.php';
 
 $app = new App($baseurl, 80, '0.0.0.0');
 
-$app->route("/chat/ws", new Chat(), ["*"]);
+$app->route("/ws/chat", new Chat(), ["*"]);
 
 $app->routes->add("some_static_html", new Route("/{opt}",
         array(

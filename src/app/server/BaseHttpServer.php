@@ -14,9 +14,16 @@ use Slim\Handlers\Strategies\RequestResponseArgs;
 use Slim\Http\Request;
 use Slim\Http\Response;
 
-
 class BaseHttpServer extends SlimHttpServer
 {
+
+    private $twig;
+
+    function __construct()
+    {
+        parent::__construct();
+        $this->twig = $GLOBALS["twig"];
+    }
 
     protected function constructSlimApp(): App
     {
@@ -33,13 +40,15 @@ class BaseHttpServer extends SlimHttpServer
             echo $GLOBALS["twig"]->render("chat-client.twig");
             return $response;
         });
-        $app->get("/src/{dir}/{file}", function (Request $r, Response $response, $dir, $file) {
+
+        $app->get("/{dir}/{file}", function (Request $r, Response $response, $dir, $file) {
             $filePath = dirname(__DIR__, 2) . "/$dir/$file";
+
             if (file_exists($filePath)) {
                 $response->getBody()->write(file_get_contents($filePath));
             } else {
-                $response->getBody()->write($GLOBALS["twig"]->render("error.html"));
                 $response->withStatus(404, "File not found");
+                $response->getBody()->write($this->twig->render("error.html"));
             }
             return $response;
         });

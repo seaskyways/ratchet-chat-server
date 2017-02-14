@@ -1,172 +1,187 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>SSW Chat</title>
-    <script src="/src/js/angular.js"></script>
-    <script src="/src/js/jquery3.js"></script>
-    <link href="/src/css/bootstrap.min.css" rel="stylesheet">
-    <script src="/src/js/bootstrap.min.js"></script>
-</head>
+{% extends "_layout.twig" %}
 
-<body ng-app="myApp" ng-controller="myCtrl" class="container">
-<br>
-<div class="row">
-    <div class="col-xs-9 col-md-4">
-        <input type="text"
-               id="nameInput"
-               title="Enter Your Name"
-               ng-model="nameInput"
-               ng-keypress="onKeyPress($event.which, 'name')"
-               class="form-control">
+{% block title %}Main{% endblock %}
+
+{% block content %}
+    <br>
+    <div class="mdl-grid--no-spacing">
+        <div class="mdl-cell--12-col mdl-card mdl-shadow--4dp">
+            <div class="mdl-card__title">
+                <h2 class="mdl-card__title-text">Chat</h2>
+            </div>
+            <form>
+                <div class="mdl-grid">
+                    <div class="mdl-cell--9-col-phone mdl-cell--4-col-desktop">
+                        <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+                            <input type="text"
+                                   id="nameInput"
+                                   ng-model="nameInput"
+                                   ng-keypress="onKeyPress($event.which, 'name')"
+                                   class="mdl-textfield__input">
+                            <label for="nameInput" class="mdl-textfield__label">Enter Name</label>
+                        </div>
+                    </div>
+
+                    <div class="mdl-cell--3-col-phone mdl-cell--2-col-desktop">
+                        <button class="mdl-button mdl-js-button mdl-button--fab mdl-button--colored mdl-color--green-600"
+                                ng-click="saveName(nameInput)">
+                            <i class="fa fa-save" aria-hidden="true"></i>
+                        </button>
+                    </div>
+
+                    <div class="mdl-cell--9-col-phone mdl-cell--4-col-desktop">
+                        <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+                            <input type="text"
+                                   id="chatInput"
+                                   title="Enter Text"
+                                   ng-model="chatInput"
+                                   ng-keypress="onKeyPress($event.which, 'chat')"
+                                   class="mdl-textfield__input">
+                            <label for="chatInput" class="mdl-textfield__label">Enter Message</label>
+                        </div>
+                    </div>
+
+                    <div class="mdl-cell--3-col-phone mdl-cell--2-col-desktop">
+                        <button ng-click="sendMessage(chatInput)"
+                                class="mdl-button mdl-js-button mdl-button--fab mdl-button--colored mdl-button--colored mdl-color--green-600">
+                            <i class="fa fa-paper-plane-o"></i>
+                        </button>
+                    </div>
+
+                    {#<button ng-click="toggleRecording()" class="col-xs-3 col-md-2 btn btn-danger">Start Recording</button>#}
+                </div>
+            </form>
+        </div>
     </div>
-
-    <button class="col-xs-3 col-md-2 btn btn-success"
-            ng-click="saveName(nameInput)">Save Name
-    </button>
-
-    <div class="col-xs-9 col-md-4">
-        <input type="text"
-               id="chatInput"
-               title="Enter Text"
-               ng-model="chatInput"
-               ng-keypress="onKeyPress($event.which, 'chat')"
-               class="form-control">
-    </div>
-
-    <button ng-click="sendMessage(chatInput)" class="col-xs-3 col-md-2 btn btn-success">Send</button>
-
-    {#<button ng-click="toggleRecording()" class="col-xs-3 col-md-2 btn btn-danger">Start Recording</button>#}
-</div>
-<br>
-<div class="row">
-    <div class="col-xs-12">
-        <ul id="chatContainer">
-            <li ng-repeat="msg in chat">
+    <br>
+    <div class="row">
+        <div class="col-xs-12" style="vertical-align: middle">
+            <ul id="chatContainer">
+                <li ng-repeat="msg in chat">
                 <span style="text-overflow: ellipsis">
                     {{ ng('msg.senderName') }} says : {{ ng('msg.text ') }}
                 </span>
-            </li>
-        </ul>
+                </li>
+            </ul>
+        </div>
     </div>
-</div>
-</body>
-<script>
-    function Message(srcId, text, senderName) {
-        this.srcId = srcId;
-        this.text = text;
-        this.senderName = senderName || srcId;
+{% endblock %}
 
-        this.asJson = function () {
-            return {
-                msg: this.text,
-                id: this.srcId
-            }
+{% block after_body %}
+    <script>
+        function Message(srcId, text, senderName) {
+            this.srcId = srcId;
+            this.text = text;
+            this.senderName = senderName || srcId;
+
+            this.asJson = function () {
+                return {
+                    msg: this.text,
+                    id: this.srcId
+                }
+            };
+            return this;
+        }
+
+        Message.fromJson = function (json) {
+            return new Message(null, json["message"], json["sender_name"]);
         };
-        return this;
-    }
 
-    Message.fromJson = function (json) {
-        return new Message(null, json["message"], json["sender_name"]);
-    };
-
-    function command(command, data) {
-        return JSON.stringify({
-            command: command,
-            data: data
-        })
-    }
-
-    var context;
-    window.addEventListener('load', init, false);
-    function init() {
-        try {
-            // Fix up for prefixing
-            window.AudioContext = window.AudioContext || window.webkitAudioContext;
-            context = new AudioContext();
+        function command(command, data) {
+            return JSON.stringify({
+                command: command,
+                data: data
+            })
         }
-        catch (e) {
-            alert('Web Audio API is not supported in this browser');
+
+        var context;
+        window.addEventListener('load', init, false);
+        function init() {
+            try {
+                // Fix up for prefixing
+                window.AudioContext = window.AudioContext || window.webkitAudioContext;
+                context = new AudioContext();
+            }
+            catch (e) {
+                alert('Web Audio API is not supported in this browser');
+            }
         }
-    }
 
-    angular.module('myApp', [])
-        .controller("myCtrl", function ($scope) {
-            $scope.chat = [];
-            $scope.chatInput = "";
-            $scope.nameInput = "";
-            $scope.myId = -1;
-            var conn = new WebSocket("ws://{{ baseurl }}/chat/ws");
+        angular.module('myApp', [])
+            .controller("myCtrl", function ($scope) {
+                $scope.chat = [];
+                $scope.chatInput = "";
+                $scope.nameInput = "";
+                $scope.myId = -1;
+                var conn = new WebSocket("ws://{{ baseurl }}/ws/chat");
 
-            conn.onmessage = function (msg) {
-                var asJson = JSON.parse(msg.data);
-                var command = asJson["command"];
-                var data = asJson["data"];
+                conn.onmessage = function (msg) {
+                    var asJson = JSON.parse(msg.data);
+                    var command = asJson["command"];
+                    var data = asJson["data"];
 
-                if (command === "connection_info") {
-                    var id = data["connection_id"];
-                    var name = data["name"] || id;
-                    var token;
+                    if (command === "connection_info") {
+                        var id = data["connection_id"];
+                        var name = data["name"] || id;
+                        var token;
 
 //                    if (data["should_invalidate"]) {
-                    localStorage.setItem("connection_token", data["token"]);
+                        localStorage.setItem("connection_token", data["token"]);
 //                    }
 
-                    $scope.myId = id;
+                        $scope.myId = id;
+                        $scope.myName = name;
+                        $scope.nameInput = name;
+                    } else if (command === "message") {
+                        $scope.chat.push(Message.fromJson(data));
+                    }
+                    $scope.$apply();
+                };
+
+                $scope.sendMessage = function (msg) {
+                    if (msg.length != 0) {
+                        var cmd = command("send_message", msg);
+                        conn.send(cmd);
+                    }
+                    $scope.chatInput = "";
+                };
+
+                $scope.onKeyPress = function (keyNumber, fieldType) {
+                    switch (fieldType) {
+                        case "name" :
+                            if (keyNumber === 13) {
+                                $scope.saveName($scope.nameInput)
+                            }
+                            break;
+                        case "chat" :
+                            if (keyNumber === 13) {
+                                $scope.sendMessage($scope.chatInput)
+                            }
+                            break;
+                    }
+                };
+
+
+                conn.onopen = function (event) {
+                    var oldToken = localStorage.getItem("connection_token");
+                    if (oldToken) {
+                        conn.send(command("get_id", oldToken))
+                    } else {
+                        conn.send(command("get_id", ""))
+                    }
+                };
+
+                $scope.saveName = function (name) {
+                    conn.send(command("save_name", {
+                        "id": $scope.myId,
+                        "name": name
+                    }));
                     $scope.myName = name;
-                    $scope.nameInput = name;
-                } else if (command === "message") {
-                    $scope.chat.push(Message.fromJson(data));
+                };
+
+                $scope.toggleRecording = function () {
+
                 }
-                $scope.$apply();
-            };
-
-            $scope.sendMessage = function (msg) {
-                if (msg.length != 0) {
-                    var cmd = command("send_message", msg);
-                    conn.send(cmd);
-                }
-                $scope.chatInput = "";
-            };
-
-            $scope.onKeyPress = function (keyNumber, fieldType) {
-                switch (fieldType) {
-                    case "name" :
-                        if (keyNumber === 13) {
-                            $scope.saveName($scope.nameInput)
-                        }
-                        break;
-                    case "chat" :
-                        if (keyNumber === 13) {
-                            $scope.sendMessage($scope.chatInput)
-                        }
-                        break;
-                }
-            };
-
-
-            conn.onopen = function (event) {
-                var oldToken = localStorage.getItem("connection_token");
-                if (oldToken) {
-                    conn.send(command("get_id", oldToken))
-                } else {
-                    conn.send(command("get_id", ""))
-                }
-            };
-
-            $scope.saveName = function (name) {
-                conn.send(command("save_name", {
-                    "id": $scope.myId,
-                    "name": name
-                }));
-                $scope.myName = name;
-            };
-
-            $scope.toggleRecording = function () {
-
-            }
-        });
-</script>
-</html>
+            });
+    </script>
+{% endblock %}

@@ -23,12 +23,15 @@ abstract class SimpleHttpServer implements HttpServerInterface
     function onMessage(ConnectionInterface $from, $msg)
     {
     }
+
     function onError(ConnectionInterface $conn, \Exception $e)
     {
     }
+
     function onClose(ConnectionInterface $conn)
     {
     }
+
     final public function onOpen(ConnectionInterface $conn, RequestInterface $r = null)
     {
         $slimRequest = new Request(
@@ -40,7 +43,7 @@ abstract class SimpleHttpServer implements HttpServerInterface
             new Body($r->getResponseBody()->getStream())
         );
 
-        $response = $this->getRequestResponse($slimRequest,new Response());
+        $response = $this->getRequestResponse($slimRequest, new Response());
         $conn->send($response);
         $conn->close();
     }
