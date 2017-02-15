@@ -15,7 +15,7 @@ use Symfony\Component\Routing\Route;
 require_once 'setup-server-host-url.php';
 require_once 'setup-twig.php';
 
-$app = new App($baseurl, 80, '0.0.0.0');
+$app = new App($baseurl, 8080, '0.0.0.0');
 
 $app->route("/ws/chat", new Chat(), ["*"]);
 

@@ -29,7 +29,7 @@
                                            ng-model="nameInput"
                                            ng-keypress="onKeyPress($event.which, 'name')"
                                            class="mdl-textfield__input">
-                                    <label for="nameInput" class="mdl-textfield__label">Enter Name</label>
+                                    <label ng-cloak for="nameInput" class="mdl-textfield__label">Enter Name</label>
                                 </div>
                             </div>
 
@@ -70,7 +70,7 @@
                     mdl-cell--12-col-tablet">
                     <div class="mdl-card mdl-shadow--8dp" style="width: 100%">
                         <ul class="mdl-list">
-                            <li class="mdl-list__item" ng-repeat="msg in chat">
+                            <li class="mdl-list__item" ng-repeat="msg in chat" ng-cloak >
                                 <span>
                                     {{ 'msg.senderName'|ng }} says : {{ 'msg.text'|ng }}
                                 </span>
@@ -129,7 +129,7 @@
                 $scope.chatInput = "";
                 $scope.nameInput = "";
                 $scope.myId = -1;
-                var conn = new WebSocket("ws://{{ baseurl }}/ws/chat");
+                var conn = new WebSocket("ws://{{ baseurl }}:8080/ws/chat");
 
                 conn.onmessage = function (msg) {
                     var asJson = JSON.parse(msg.data);
