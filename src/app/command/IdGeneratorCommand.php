@@ -9,6 +9,7 @@
 namespace MyApp\Command;
 
 use MyApp\Chat\Chat;
+use MyApp\Model\User;
 
 class IdGeneratorCommand
 {
@@ -23,6 +24,16 @@ class IdGeneratorCommand
         $this->tokenMap = array();
         $this->doOnExecute = function () {
         };
+
+        if (empty($this->tokenMap)) {
+            $arr = User::select(User::$column_token)
+                ->select("id")
+                ->find_array();
+
+            foreach ($arr as $value) {
+                $this->tokenMap[$value["token"]] = $value["id"];
+            }
+        }
     }
 
 
@@ -34,9 +45,12 @@ class IdGeneratorCommand
     function execute(...$data)
     {
 
+
+
         $conn = $data[0];
         $lastToken = $data[1];
         $id = null;
+
 
         if (empty($lastToken)) {
 
@@ -57,7 +71,22 @@ class IdGeneratorCommand
             echo "Sent new token : " . $token . PHP_EOL;
             $id = $this->lastId;
             $this->lastId++;
+
+            User::create()
+                ->set("name", $id)
+                ->set("token", $token)
+                ->save();
+
         } else {
+
+            $userOfToken = User::where_equal(User::$column_name, $lastToken)
+                ->find_one();
+
+            if (empty($userOfToken)) {
+
+            } else {
+
+            }
 
             foreach ($this->tokenMap as $t => $_) {
                 if ($lastToken == $t) {
@@ -70,7 +99,7 @@ class IdGeneratorCommand
                 $this->execute($data[0], null);
                 return;
             } else {
-                echo "User with id: $id just rejoined !";
+                echo "User with id: $id just rejoined !" . PHP_EOL;
 
                 $data[0]->send(json_encode([
                     "command" => "connection_info",
@@ -105,7 +134,7 @@ class IdGeneratorCommand
     static public function getPersonName($id): string
     {
         if (array_key_exists($id, $GLOBALS["nameMap"])) {
-            return $GLOBALS["nameMap"][$id];
+            return $GLOBALS["nameMap"]["$id"];
         } else {
             return "$id";
         }

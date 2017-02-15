@@ -17,12 +17,9 @@ use Slim\Http\Response;
 class AppHttpServer extends SlimHttpServer
 {
 
-    private $twig;
-
     function __construct()
     {
         parent::__construct();
-        $this->twig = $GLOBALS["twig"];
     }
 
     protected function constructSlimApp(): App
@@ -36,27 +33,50 @@ class AppHttpServer extends SlimHttpServer
 
     protected function setupSlimApp(App $app)
     {
-        $app->get("[/]", function (Request $request, Response $response) {
-            echo $GLOBALS["twig"]->render("chat-client.twig");
+
+        $app->get("[/]", function (Request $request, Response $response){
+            echo twig()->render("chat-client.twig");
             return $response;
         });
 
         $allowedDirs = ["js", "css", "fonts"];
         $dirs = join("|", $allowedDirs);
-        $app->get("/{dir: $dirs }/{file}", function (Request $r, Response $response, $dir, $file) {
-            $filePath = dirname(__DIR__, 2) . "/$dir/$file";
 
-            if (file_exists($filePath)) {
-                $response
-                    ->withHeader("content-type", mime_content_type($filePath))
-                    ->write(file_get_contents($filePath));
-            } else {
-                $response
-                    ->withHeader("Content-Type", "text/html")
-                    ->withStatus(404, "File not found")
-                    ->write($GLOBALS["twig"]->render("error.twig"));
-            }
-            return $response;
+        $app->group("/{dir : $dirs}", function (){
+
+            /** @noinspection PhpUndefinedMethodInspection */
+            $this->get("/{file}", function (Request $r, Response $response, $dir, $file) {
+                $filePath = dirname(__DIR__, 2) . "/$dir/$file";
+
+                if (file_exists($filePath)) {
+                    $response
+                        ->withHeader("content-type", mime_content_type($filePath))
+                        ->write(file_get_contents($filePath));
+                } else {
+                    $response
+                        ->withHeader("Content-Type", "text/html")
+                        ->withStatus(404, "File not found")
+                        ->write(twig()->render("error.twig"));
+                }
+                return $response;
+            });
+
         });
+
+//        $app->get("/{dir: $dirs }/{file}", function (Request $r, Response $response, $dir, $file) {
+//            $filePath = dirname(__DIR__, 2) . "/$dir/$file";
+//
+//            if (file_exists($filePath)) {
+//                $response
+//                    ->withHeader("content-type", mime_content_type($filePath))
+//                    ->write(file_get_contents($filePath));
+//            } else {
+//                $response
+//                    ->withHeader("Content-Type", "text/html")
+//                    ->withStatus(404, "File not found")
+//                    ->write($GLOBALS["twig"]->render("error.twig"));
+//            }
+//            return $response;
+//        });
     }
 }

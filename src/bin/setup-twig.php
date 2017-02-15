@@ -13,6 +13,11 @@ $GLOBALS["twig"] = $twig = new Twig_Environment($loader, array(
     'debug' => true,
 ));
 
+function twig()
+{
+    return $GLOBALS["twig"];
+}
+
 $twig->addGlobal("baseurl", $baseurl);
 
 $twig->addFunction(new Twig_Function("ng", function ($exp) {

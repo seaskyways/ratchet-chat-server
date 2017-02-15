@@ -129,7 +129,7 @@
                 $scope.chatInput = "";
                 $scope.nameInput = "";
                 $scope.myId = -1;
-                var conn = new WebSocket("ws://{{ baseurl }}/ws/chat");
+                var conn = new WebSocket("ws://{{ baseurl }}:8080/ws/chat");
 
                 conn.onmessage = function (msg) {
                     var asJson = JSON.parse(msg.data);

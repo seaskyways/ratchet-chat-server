@@ -14,14 +14,19 @@ use Symfony\Component\Routing\Route;
 
 require_once 'setup-server-host-url.php';
 require_once 'setup-twig.php';
+require_once 'idiorm.php';
+require_once 'paris.php';
+require_once 'setup-database.php';
 
-$app = new App($baseurl, 80, '0.0.0.0');
+$app = new App($baseurl, 8080, '0.0.0.0');
 
 $app->route("/ws/chat", new Chat(), ["*"]);
 
+$appHttpServer = new AppHttpServer;
+
 $app->routes->add("some_static_html", new Route("/{opt}",
         array(
-            "_controller" => new AppHttpServer(),
+            "_controller" => $appHttpServer,
             "opt" => ""
         ),
         array(
