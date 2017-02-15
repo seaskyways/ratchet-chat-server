@@ -2,8 +2,10 @@
   "autoload": {
     "psr-4": {
       "MyApp\\Chat\\": "src/app/chat",
-      "MyApp\\Command\\" : "src/app/command",
-      "MyApp\\Server\\" : "src/app/server"
+      "MyApp\\Command\\": "src/app/command",
+      "MyApp\\Server\\": "src/app/server",
+      "MyApp\\Database\\": "src/app/database",
+      "MyApp\\Model\\": "src/app/model"
     }
   },
   "require": {

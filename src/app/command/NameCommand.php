@@ -10,14 +10,27 @@ namespace MyApp\Command;
 
 
 use MyApp\Chat\Chat;
+use MyApp\Model\User;
+use Rx\Subject\Subject;
 
 class NameCommand
 {
     use ChatCommand;
 
+    public static $nameChangedSubject;
+
     function __construct()
     {
-        $GLOBALS["nameMap"] = array();
+        NameCommand::$nameChangedSubject = Subject::create(function (){
+
+        });
+
+        $GLOBALS["nameMap"] = $nameMap = array();
+
+        $users = User::find_array();
+        foreach ($users as $user) {
+            $nameMap[$user["id"]] = $user["name"];
+        }
     }
 
     function getCommandTag(): string
@@ -27,13 +40,19 @@ class NameCommand
 
     function execute(...$data)
     {
+        $nameMap = $GLOBALS["nameMap"];
+
         $id = $data[0];
         $name = $data[1];
-        $oldName = $GLOBALS["nameMap"][$id] ?? $id;
+        $oldName = $nameMap[$id] ?? $id;
 
         if (strtolower($name) == strtolower($oldName)) return;
 
         $GLOBALS["nameMap"][$id] = $name;
+
+        User::find_one($id)
+            ->set("name", $name)
+            ->save();
 
         foreach (Chat::$clients as $c) {
             $c->send(command("message", [
