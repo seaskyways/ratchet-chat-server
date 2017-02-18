@@ -34,7 +34,7 @@ class AppHttpServer extends SlimHttpServer
     protected function setupSlimApp(App $app)
     {
 
-        $app->get("[/]", function (Request $request, Response $response){
+        $app->get("[/]", function (Request $request, Response $response) {
             echo twig()->render("chat-client.twig");
             return $response;
         });
@@ -42,16 +42,17 @@ class AppHttpServer extends SlimHttpServer
         $allowedDirs = ["js", "css", "fonts"];
         $dirs = join("|", $allowedDirs);
 
-        $app->group("/{dir : $dirs}", function (){
+        $app->group("/{dir : $dirs}", function () {
 
             /** @noinspection PhpUndefinedMethodInspection */
             $this->get("/{file}", function (Request $r, Response $response, $dir, $file) {
                 $filePath = dirname(__DIR__, 2) . "/$dir/$file";
-
                 if (file_exists($filePath)) {
-                    $response
-                        ->withHeader("content-type", mime_content_type($filePath))
-                        ->write(file_get_contents($filePath));
+                    $info = finfo_open(FILEINFO_MIME);
+
+
+                    $response->withHeader("Content-Type", mime_content_type($filePath));
+                    readfile($filePath);
                 } else {
                     $response
                         ->withHeader("Content-Type", "text/html")

@@ -10,30 +10,25 @@ namespace MyApp\Command;
 
 use MyApp\Chat\Chat;
 use MyApp\Model\User;
+use Ratchet\ConnectionInterface;
 
 class IdGeneratorCommand
 {
     use ChatCommand;
 
-    public $tokenMap;
-    private $lastId = 1;
     public $doOnExecute;
 
     function __construct()
     {
-        $this->tokenMap = array();
         $this->doOnExecute = function () {
         };
+    }
 
-        if (empty($this->tokenMap)) {
-            $arr = User::select(User::$column_token)
-                ->select("id")
-                ->find_array();
-
-            foreach ($arr as $value) {
-                $this->tokenMap[$value["token"]] = $value["id"];
-            }
-        }
+    private function getIdsTokens()
+    {
+        return User::select(User::$column_token)
+            ->select("id")
+            ->find_array();
     }
 
 
@@ -44,9 +39,6 @@ class IdGeneratorCommand
 
     function execute(...$data)
     {
-
-
-
         $conn = $data[0];
         $lastToken = $data[1];
         $id = null;
@@ -55,61 +47,44 @@ class IdGeneratorCommand
         if (empty($lastToken)) {
 
             $token = $this->generateToken();
-            $this->tokenMap[$token] = $this->lastId;
+            $newUser = User::create()
+                ->set(User::$column_token, $token);
 
-            $result = json_encode([
-                "command" => "connection_info",
-                "data" => [
-                    "connection_id" => $this->lastId,
-                    "token" => $token,
-                    "should_invalidate" => true
-                ]
+            $newUser->save();
+            $id = $newUser->id();
+
+
+            $result = command("connection_info", [
+                "connection_id" => $id,
+                "token" => $token,
+                "should_invalidate" => true
             ]);
 
             $conn->send($result);
 
             echo "Sent new token : " . $token . PHP_EOL;
-            $id = $this->lastId;
-            $this->lastId++;
-
-            User::create()
-                ->set("name", $id)
-                ->set("token", $token)
-                ->save();
 
         } else {
 
-            $userOfToken = User::where_equal(User::$column_name, $lastToken)
+            $userOfToken = User::where_equal(User::$column_token, $lastToken)
                 ->find_one();
 
+
             if (empty($userOfToken)) {
-
-            } else {
-
-            }
-
-            foreach ($this->tokenMap as $t => $_) {
-                if ($lastToken == $t) {
-                    $id = $this->tokenMap[$lastToken];
-                    break;
-                }
-            }
-            if (empty($id)) {
                 echo "Couldn't find id for token " . $lastToken . PHP_EOL;
                 $this->execute($data[0], null);
-                return;
             } else {
+                $id = $userOfToken->id();
+
                 echo "User with id: $id just rejoined !" . PHP_EOL;
 
-                $data[0]->send(json_encode([
-                    "command" => "connection_info",
-                    "data" => [
+                $data[0]->send(command("connection_info", [
                         "connection_id" => $id,
                         "token" => $lastToken,
                         "should_invalidate" => false,
                         "name" => $this->getPersonName($id)
                     ]
-                ]));
+                ));
             }
         }
 
@@ -133,10 +108,25 @@ class IdGeneratorCommand
 
     static public function getPersonName($id): string
     {
-        if (array_key_exists($id, $GLOBALS["nameMap"])) {
-            return $GLOBALS["nameMap"]["$id"];
-        } else {
+        $name = User::select(User::$column_name)->find_one($id)->name;
+        if (empty($name)) {
             return "$id";
+        } else {
+            return $name;
         }
+    }
+
+    static public function getIdOfConnection(ConnectionInterface $conn)
+    {
+        return Chat::$clients[$conn]["id"];
+    }
+
+    static public function getConnectionById(int $id){
+        foreach (Chat::$clients as $client){
+            if ($client["id"] == $id){
+                return $client;
+            }
+        }
+        return null;
     }
 }
