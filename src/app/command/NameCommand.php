@@ -17,13 +17,8 @@ class NameCommand
 {
     use ChatCommand;
 
-    public static $nameChangedSubject;
-
     function __construct()
     {
-        NameCommand::$nameChangedSubject = Subject::create(function (){
-
-        });
 
         $GLOBALS["nameMap"] = $nameMap = array();
 
@@ -61,4 +56,5 @@ class NameCommand
             ]));
         }
     }
+
 }

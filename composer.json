@@ -5,7 +5,8 @@
       "MyApp\\Command\\": "src/app/command",
       "MyApp\\Server\\": "src/app/server",
       "MyApp\\Database\\": "src/app/database",
-      "MyApp\\Model\\": "src/app/model"
+      "MyApp\\Model\\": "src/app/model",
+      "MyApp\\Data\\": "src/app/data"
     }
   },
   "require": {
