@@ -62,21 +62,5 @@ class AppHttpServer extends SlimHttpServer
             });
 
         });
-
-//        $app->get("/{dir: $dirs }/{file}", function (Request $r, Response $response, $dir, $file) {
-//            $filePath = dirname(__DIR__, 2) . "/$dir/$file";
-//
-//            if (file_exists($filePath)) {
-//                $response
-//                    ->withHeader("content-type", mime_content_type($filePath))
-//                    ->write(file_get_contents($filePath));
-//            } else {
-//                $response
-//                    ->withHeader("Content-Type", "text/html")
-//                    ->withStatus(404, "File not found")
-//                    ->write($GLOBALS["twig"]->render("error.twig"));
-//            }
-//            return $response;
-//        });
     }
 }

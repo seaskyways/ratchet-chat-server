@@ -6,6 +6,6 @@
  * Time: 2:40 PM
  */
 
-require_once 'base-url.php';
+require_once 'base-urll.php';
 
 $GLOBALS["baseurl"] = $baseurl;
